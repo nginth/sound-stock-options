@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript">
+            var audio = new Audio("/audio/test.mp3");
+            audio.play();
+        </script>
+    </head>
+    <body>
+        <h1>Photo Page</h1>
+    </body>
+</html>

@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Photo Page</h1>
+    <p>Here's your photo link: <a href="<%= link %>">link</a></p>
+  </body>
+</html>
