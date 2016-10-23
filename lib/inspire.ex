@@ -36,6 +36,10 @@ defmodule Inspire.Web do
   get _ do
     Routers.WebsiteRouter.call(conn, [])
   end
+
+  post _ do
+    Routers.WebsiteRouter.call(conn, [])
+  end
 end
 
 defmodule User do

@@ -102,12 +102,10 @@ defmodule Sequencer do
   @rate 44100
 
   @bpm 140
-  @jingle_bells "|g4-e5-d5-c5-g4-|-g4-g4-e5-d5-c5-a4-|-a4-a4-f5-e5-d5-b4-|-f5-f5-e5-d5-e5-|g4-e5-d5-c5-g4-|-g4-g4-e5-d5-c5-a4-|-a4-a4-f5-e5-d5-b4-|-f5-g5-g5-g5-g5-a5-g5-f5-d5-c5-|e5-e5-e5-|-e5-e5-e5-|-e5-g5-c5-d5-e5-|-f5-f5-f5-f5-f5-|-e5-e5-e5-e5-|-d5-d5-e5-d5-g5|e5-e5-e5-|-e5-e5-e5-|-e5-g5-c5-d5-e5-|-f5-f5-f5-f5-f5-|-e5-e5-e5-e5-|-g5-f5-e5-d5-c5--|"
-  @happy_birthday "|--a4--a4--b4--a4--d5--C5---a4--a4--b4--a4-e5--d5----a4--a4-a5--F5--d5--C5---b4--g5-g5--F5--d5--e5--d5--|"
-  @v_lesu_rodilas_elochka "|--c4-a4-a4-g4-a4-f4-c4-c4-c4-a4-a4-A4-g4-c5>>---c5-d4-d4-b4-b4-a4-g4-f4-c4-a4-a4-g4-a4-f4>>---e4-d4-d4-b4-b4-a4-g4-f4-c4-a4-a4-g4-a4-f4>>---|"
   def run(fin_data) do
     header = %WavHeader{channels: 1, rate: @rate}
-    {:ok, writer} = WavWriter.open(System.user_home() <> "/seq.wav", header)
+    dir = System.tmp_dir() <> "/seq.wav"
+    {:ok, writer} = WavWriter.open(dir, header)
     sequencer = generate_song(fin_data) |> Sequencer.from_simple_string(Sequencer.bpm_to_duration(@bpm, 4))
     total_duration = Sequencer.sequence_duration(sequencer)
 
@@ -134,6 +132,7 @@ defmodule Sequencer do
       Context.get_sample(ctx, :main, :filter, %{sample: mixed_sample})
     end)
     WavWriter.close(writer)
+    dir
   end
 
   def generate_song(fin_data) do
@@ -146,11 +145,12 @@ defmodule Sequencer do
     low = Map.get(data, "low") |> Map.get("values")
     open = Map.get(data, "open") |> Map.get("values")
     list = close ++ high ++ low ++ open
-
+    IO.inspect list
     generate_song(list, "")
   end
   def generate_song([head | tail], song) do
     next_note = @notes |> elem(rem(round(head), tuple_size(@notes))) 
+    IO.inspect rem(round(head), tuple_size(@notes))
     generate_song(tail, song <> "-" <> next_note)
   end
   def generate_song([], song) do
