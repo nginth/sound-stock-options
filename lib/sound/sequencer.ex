@@ -1,22 +1,114 @@
 defmodule Sequencer do
   alias Synthex.Context
-  alias Synthex.Output.SoxPlayer
   alias Synthex.Generator.Oscillator
   alias Synthex.Filter.Moog
   alias Synthex.Sequencer
   alias Synthex.ADSR
+  alias Synthex.Output.WavWriter
+  alias Synthex.File.WavHeader
 
   use Synthex.Math
 
+@notes {
+    "c8",
+    "b7",
+    "A7",
+    "a7",
+    "G7",
+    "g7",
+    "F7",
+    "f7",
+    "e7",
+    "D7",
+    "d7",
+    "C7",
+    "c7",
+    "b6",
+    "A6",
+    "a6",
+    "G6",
+    "g6",
+    "F6",
+    "f6",
+    "e6",
+    "D6",
+    "d6",
+    "C6",
+    "c6",
+    "b5",
+    "A5",
+    "a5",
+    "G5",
+    "g5",
+    "F5",
+    "f5",
+    "e5",
+    "D5",
+    "d5",
+    "C5",
+    "c5",
+    "b4",
+    "A4",
+    "a4",
+    "G4",
+    "g4",
+    "F4",
+    "f4",
+    "e4",
+    "D4",
+    "d4",
+    "C4",
+    "c4",
+    "b3",
+    "A3",
+    "a3",
+    "G3",
+    "g3",
+    "F3",
+    "f3",
+    "e3",
+    "D3",
+    "d3",
+    "C3",
+    "c3",
+    "b2",
+    "A2",
+    "a2",
+    "g2",
+    "F2",
+    "f2",
+    "e2",
+    "D2",
+    "d2",
+    "C2",
+    "c2",
+    "b1",
+    "A1",
+    "a1",
+    "G1",
+    "g1",
+    "F1",
+    "f1",
+    "e1",
+    "D1",
+    "d1",
+    "C1",
+    "c1",
+    "b0",
+    "A0",
+    "a0" 
+  }
+
   @rate 44100
 
-  @bpm 70
+  @bpm 140
   @jingle_bells "|g4-e5-d5-c5-g4-|-g4-g4-e5-d5-c5-a4-|-a4-a4-f5-e5-d5-b4-|-f5-f5-e5-d5-e5-|g4-e5-d5-c5-g4-|-g4-g4-e5-d5-c5-a4-|-a4-a4-f5-e5-d5-b4-|-f5-g5-g5-g5-g5-a5-g5-f5-d5-c5-|e5-e5-e5-|-e5-e5-e5-|-e5-g5-c5-d5-e5-|-f5-f5-f5-f5-f5-|-e5-e5-e5-e5-|-d5-d5-e5-d5-g5|e5-e5-e5-|-e5-e5-e5-|-e5-g5-c5-d5-e5-|-f5-f5-f5-f5-f5-|-e5-e5-e5-e5-|-g5-f5-e5-d5-c5--|"
   @happy_birthday "|--a4--a4--b4--a4--d5--C5---a4--a4--b4--a4-e5--d5----a4--a4-a5--F5--d5--C5---b4--g5-g5--F5--d5--e5--d5--|"
   @v_lesu_rodilas_elochka "|--c4-a4-a4-g4-a4-f4-c4-c4-c4-a4-a4-A4-g4-c5>>---c5-d4-d4-b4-b4-a4-g4-f4-c4-a4-a4-g4-a4-f4>>---e4-d4-d4-b4-b4-a4-g4-f4-c4-a4-a4-g4-a4-f4>>---|"
-  def run() do
-    {:ok, writer} = SoxPlayer.open(rate: @rate, channels: 1)
-    sequencer = Sequencer.from_simple_string(@v_lesu_rodilas_elochka, Sequencer.bpm_to_duration(@bpm, 4))
+  def run(fin_data) do
+    header = %WavHeader{channels: 1, rate: @rate}
+    {:ok, writer} = WavWriter.open(System.user_home() <> "/seq.wav", header)
+    sequencer = generate_song(fin_data) |> Sequencer.from_simple_string(Sequencer.bpm_to_duration(@bpm, 4))
     total_duration = Sequencer.sequence_duration(sequencer)
 
     context =
@@ -41,6 +133,33 @@ defmodule Sequencer do
       mixed_sample = ((osc1 * 0.25) + (osc1_1 * 0.25) + (osc2 * 0.25) + (osc2_1 * 0.25)) * adsr
       Context.get_sample(ctx, :main, :filter, %{sample: mixed_sample})
     end)
-    SoxPlayer.close(writer)
+    WavWriter.close(writer)
+  end
+
+  def generate_song(fin_data) do
+    data = 
+      Map.get(fin_data, "Elements") 
+      |> List.first 
+      |> Map.get("DataSeries")
+    close = Map.get(data, "close") |> Map.get("values")
+    high = Map.get(data, "high") |> Map.get("values")
+    low = Map.get(data, "low") |> Map.get("values")
+    open = Map.get(data, "open") |> Map.get("values")
+    list = close ++ high ++ low ++ open
+
+    generate_song(list, "")
+  end
+  def generate_song([head | tail], song) do
+    next_note = @notes |> elem(rem(round(head), tuple_size(@notes))) 
+    generate_song(tail, song <> "-" <> next_note)
+  end
+  def generate_song([], song) do
+    song
   end
 end
+
+
+
+
+
+

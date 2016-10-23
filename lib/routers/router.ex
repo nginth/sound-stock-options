@@ -35,17 +35,18 @@ defmodule Routers do
         use Router
 
         def route("GET", ["finance", symbol], conn) do
-            body = Finance.getChartData(5, symbol)
-            conn |> Plug.Conn.send_resp(200, body)
+            res = Finance.getChartData(5, symbol)
+            conn |> Plug.Conn.send_resp(200, res)
         end
     end
 
-    defmodule PhotoRouter do
+    defmodule SynthRouter do
         use Router
 
-        def route("GET", ["photo", query], conn) do
-            response = HTTPotion.get "https://api.flickr.com/services/rest/", query: %{method: "flickr.photos.search", api_key: "18909702572380511bc12de7e265348a", text: query} 
-            conn |> Plug.Conn.send_resp(200, response.body)
+        def route("GET", ["synth", symbol], conn) do
+            body = Finance.getChartData(100, symbol)
+            Sequencer.run(body)
+            conn |> Plug.Conn.send_resp(200, "sound created")
         end
     end
 
@@ -53,19 +54,12 @@ defmodule Routers do
         use Router
 
         @user_router_options UserRouter.init([])
-        @photo_router_options PhotoRouter.init([])
         @finance_router_options FinanceRouter.init([])
-        def route("GET", ["hello"], conn) do
-            conn |> Plug.Conn.send_resp(200, "Hello, World!")
-        end
-        def route("GET", ["photo" | path], conn) do
-            PhotoRouter.call(conn, @photo_router_options)
-        end
-        def route("GET", ["users" | path], conn) do
-            UserRouter.call(conn, @user_router_options)
-        end
         def route("GET", ["finance" | path], conn) do
             FinanceRouter.call(conn, @finance_router_options)
+        end
+        def route("GET", ["synth" | path], conn) do
+            SynthRouter.call(conn, [])
         end
         def route("GET", ["soundtest"], conn) do
             page_contents = EEx.eval_file("templates/sound_test.eex", [])

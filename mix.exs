@@ -40,7 +40,7 @@ defmodule Helloplug.Mixfile do
       {:sqlite_ecto, "~> 1.0.0"},
       {:ecto, "~> 1.0"},
       {:httpotion, "~> 3.0.2"},
-      {:synthex, "~> 0.0.1"}
+      {:synthex, "~> 0.1.0"}
     ]
   end
 end

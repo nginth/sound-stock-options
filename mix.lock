@@ -13,4 +13,4 @@
   "ranch": {:hex, :ranch, "1.2.1", "a6fb992c10f2187b46ffd17ce398ddf8a54f691b81768f9ef5f461ea7e28c762", [:make], []},
   "sqlite_ecto": {:hex, :sqlite_ecto, "1.0.0", "63c1da849c5862c04207928b4a465bdf5e70e84151bed1cdc29d426bd8d8f2ee", [:mix], [{:ecto, "~> 1.0", [hex: :ecto, optional: false]}, {:poison, "~> 1.0", [hex: :poison, optional: false]}, {:sqlitex, "~> 0.8", [hex: :sqlitex, optional: false]}]},
   "sqlitex": {:hex, :sqlitex, "0.8.3", "226901fe73fb9d74a5bc742594074dc3cac725ee632d595a704dd8bf92661044", [:mix], [{:decimal, "~> 1.1.0", [hex: :decimal, optional: false]}, {:esqlite, "~> 0.2.0", [hex: :esqlite, optional: false]}, {:pipe, "~> 0.0.2", [hex: :pipe, optional: false]}]},
-  "synthex": {:hex, :synthex, "0.0.1", "6fe6a657c9925f39a5c15703fcd2d226e962835c5f44e92446c77204d1c3cc43", [:mix], []}}
+  "synthex": {:hex, :synthex, "0.1.0", "82b69ac87809706dcc9c6a7a6b3e21f5fe738a85148fd593f1416a64639367f9", [:mix], []}}
